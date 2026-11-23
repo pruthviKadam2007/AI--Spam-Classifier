@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AI Spam Message Classifier</title>
+
+    <link rel="stylesheet"
+    href="{{ url_for('static', filename='style.css') }}">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<header class="topbar">
+    <h2>🛡️ AI Spam Classifier</h2>
+
+    <nav>
+        <a href="/">Dashboard</a>
+        <a href="/history">Message History</a>
+    </nav>
+</header>
+
+
+<section class="charts">
+    <h2>Spam Analysis Dashboard</h2>
+
+    <div class="chart-container">
+        <div class="chart-card">
+            <h3>Spam vs Not Spam</h3>
+            <canvas id="spamPieChart"></canvas>
+        </div>
+
+        <div class="chart-card">
+            <h3>Message Statistics</h3>
+            <canvas id="spamBarChart"></canvas>
+        </div>
+    </div>
+</section>
+
+<script>
+const spam = Number({{ chart_spam|tojson }});
+const safe = Number({{ chart_safe|tojson }});
+
+new Chart(document.getElementById('spamPieChart'), {
+    type: 'pie',
+    data: {
+        labels: ['Spam', 'Not Spam'],
+        datasets: [{
+            data: [spam, safe],
+            backgroundColor: ['#ef4444', '#22c55e']
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: true
+    }
+});
+
+new Chart(document.getElementById('spamBarChart'), {
+    type: 'bar',
+    data: {
+        labels: ['Spam', 'Not Spam'],
+        datasets: [{
+            label: 'Total Messages',
+            data: [spam, safe],
+            backgroundColor: ['#ef4444', '#22c55e']
+        }]
+    },
+    options: {
+        responsive: true,
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    precision: 0
+                }
+            }
+        }
+    }
+});
+</script>
+        <a href="/history">Message History</a>
+    </nav>
+</header>
+
+<main class="container">
+
+    <section class="welcome">
+        <h1>AI Spam Message Classifier</h1>
+        <p>Detect spam messages using Machine Learning.</p>
+    </section>
+
+    <section class="stats">
+        <div class="stat-card">
+            <h3>Total Messages</h3>
+            <p>{{ total }}</p>
+        </div>
+
+        <div class="stat-card spam-card">
+            <h3>Spam Messages</h3>
+            <p>{{ spam_count }}</p>
+        </div>
+
+        <div class="stat-card safe-card">
+            <h3>Safe Messages</h3>
+            <p>{{ safe_count }}</p>
+        </div>
+    </section>
+
+    <section class="classifier">
+        <h2>Check Your Message</h2>
+        <p>Enter a message below to check whether it is spam.</p>
+
+        <form method="POST" action="/">
+            <textarea
+                name="message"
+                placeholder="Type your message here..."
+                required>{{ message }}</textarea>
+
+            <button type="submit">🔍 Check Message</button>
+        </form>
+
+        {% if result %}
+        <div class="result">
+            <h3>Prediction Result</h3>
+            <p>{{ result }}</p>
+        </div>
+        {% endif %}
+    </section>
+
+    <section class="recent">
+        <div class="section-heading">
+            <h2>Recent Messages</h2>
+            <a href="/history">View All →</a>
+        </div>
+
+        {% if recent %}
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Message</th>
+                        <th>Prediction</th>
+                        <th>Date & Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in recent %}
+                    <tr>
+                        <td>{{ item[0] }}</td>
+                        <td>{{ item[1] }}</td>
+                        <td>{{ item[2] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="empty">No messages checked yet.</p>
+        {% endif %}
+    </section>
+
+</main>
+
+<footer>
+    <p>AI Spam Message Classifier | B.Sc. AI & Data Analytics Project</p>
+</footer>
+
+</body>
+</html>

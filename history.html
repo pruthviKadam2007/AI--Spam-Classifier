@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Message History | AI Spam Classifier</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<header class="topbar">
+    <h2>🛡️ AI Spam Classifier</h2>
+    <nav>
+        <a href="/">Dashboard</a>
+        <a href="/history">Message History</a>
+    </nav>
+</header>
+
+<main class="container">
+    <section class="welcome">
+        <h1>Message History</h1>
+        <p>Search, filter and download your checked messages.</p>
+    </section>
+
+    <section class="recent">
+        <div class="section-heading">
+            <h2>All Messages</h2>
+            <a href="/">← Back to Dashboard</a>
+        </div>
+
+        <form method="GET" action="/history" class="search-form">
+            <input
+                type="text"
+                name="search"
+                placeholder="Search message..."
+                value="{{ search }}"
+            >
+
+            <select name="filter">
+                <option value="all" {% if filter_by == 'all' %}selected{% endif %}>
+                    All Messages
+                </option>
+                <option value="spam" {% if filter_by == 'spam' %}selected{% endif %}>
+                    Spam Only
+                </option>
+                <option value="safe" {% if filter_by == 'safe' %}selected{% endif %}>
+                    Not Spam Only
+                </option>
+            </select>
+
+            <button type="submit">Search / Filter</button>
+            <a href="/history">Reset</a>
+        </form>
+
+        <p>
+            <a href="/download-report">📥 Download All Messages (CSV)</a>
+        </p>
+
+        {% if records %}
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Message</th>
+                        <th>Prediction</th>
+                        <th>Date &amp; Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in records %}
+                    <tr>
+                        <td>{{ item[0] }}</td>
+                        <td>{{ item[1] }}</td>
+                        <td>{{ item[2] }}</td>
+                        <td>{{ item[3] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <form method="POST" action="/clear-history"
+              onsubmit="return confirm('Are you sure you want to clear all history?');">
+            <button type="submit" class="danger-button">Clear All History</button>
+        </form>
+
+        {% else %}
+        <p class="empty">No matching messages found.</p>
+        {% endif %}
+    </section>
+</main>
+
+<footer>
+    <p>AI Spam Message Classifier | B.Sc. AI &amp; Data Analytics Project</p>
+</footer>
+
+</body>
+</html>
